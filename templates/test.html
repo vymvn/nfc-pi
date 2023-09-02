@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Button Example</title>
+  <style>
+    .content {
+      display: none;
+      margin-top: 10px;
+      padding: 10px;
+      background-color: #f0f0f0;
+    }
+  </style>
+  <script>
+    function showContent(id) {
+      var content = document.getElementById(id);
+      if (content.style.display === "none") {
+        content.style.display = "block";
+      } else {
+        content.style.display = "none";
+      }
+    }
+  </script>
+</head>
+<body>
+  <h1>Button Example</h1>
+  <button onclick="showContent('content1')">Toggle Content 1</button>
+  <button onclick="showContent('content2')">Toggle Content 2</button>
+  
+  <div id="content1" class="content">
+    <h2>Content 1</h2>
+    <p>This is the content of div 1.</p>
+  </div>
+  
+  <div id="content2" class="content">
+    <h2>Content 2</h2>
+    <p>This is the content of div 2.</p>
+  </div>
+</body>
+</html>

@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="en" data-bs-theme="dark">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="{{url_for('static', filename='css/bootstrap.css')}}" >
+    <!-- <link rel="stylesheet" href="{{url_for('static', filename='css/custom.scss')}}" > -->
+    <title>NFC Pi</title>
+
+    <!-- Favicon stuff -->
+
+    <!-- <link rel="apple-touch-icon" sizes="180x180" href="/static/img/favicons/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/static/img/favicons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/static/img/favicons/favicon-16x16.png">
+    <link rel="manifest" href="/static/img/favicons/site.webmanifest">
+    <link rel="mask-icon" href="/static/img/favicons/safari-pinned-tab.svg" color="#5bbad5">
+    <link rel="shortcut icon" href="/static/img/favicons/favicon.ico">
+    <meta name="msapplication-TileColor" content="#da532c">
+    <meta name="msapplication-config" content="/static/img/favicons/browserconfig.xml">
+    <meta name="theme-color" content="#ffffff"> -->
+
+    <!-- end favicon stuff -->
+  </head>
+
+
+
+
+  <body class="text-light"  style="background-color: black;">
+
+   <!-- Nav bar -->
+    <!-- <nav class="navbar navbar-expand-md bg-dark navbar-dark">
+      <a href="/" class="navbar-brand">
+        <div class="container">
+          <h3>NFC</h3> </a>
+        </div>
+    </nav> -->
+    <!--End nav bar -->
+
+
+  <!-- Scan card Modal -->
+  <div class="modal fade" id="scan-card-modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="staticBackdropLabel">Scan card</h1>
+          <!-- <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button> -->
+        </div>
+        <div class="modal-body">
+          Scan NFC tag on the PN532 and keep it till the scan finishes
+
+          <br>
+
+          Scanning.. 
+          <div class="spinner-border spinner-border-sm" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+
+        </div>
+        <div class="modal-footer">
+          <form action="/cancel-scan" method="post">
+            <input type="submit" class="btn btn-danger" name="cancel" value="Cancel" data-bs-dismiss="modal" />
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Save card Modal -->
+  <div class="modal fade" id="save-card-modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="staticBackdropLabel">Save card</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          Card scanned successfully<br> You may now remove the card.
+          <div class="mb-3">
+            <form action="/save-card" method="post">
+                <label class="col-form-label">Name:</label>
+                <input type="text" name="name" class="form-control" id="card-name-input" required>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <!-- <button type="button" id="save-button" class="btn btn-success" data-bs-dismiss="modal">Save</button> -->
+            <input type="submit" id="save-button" value="Save" class="btn btn-success" data-bs-dismiss="modal">
+            </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Error Modal -->
+  <div class="modal fade" id="error-modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="staticBackdropLabel">Scan card</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          Server ran into an error!
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" data-bs-dismiss="modal">ok :(</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- timeout modal -->
+  <div class="modal fade" id="timeout-modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="staticBackdropLabel">Timed out</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          Server timed out while waiting for NFC card.
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" data-bs-dismiss="modal">ok :(</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- progress Modal -->
+  <div class="modal fade" id="progress-modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-body">
+          Card found! Keep card on reader while the scan finishes.
+          <div class="spinner-border" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+    
+    <!-- Buttons section -->
+    <section class="pb-5">
+
+    <!-- Read/write buttons -->
+      <div class="container text-center pt-5">
+        <div class="row">
+          <div class="col">
+                <!-- Button trigger modal -->
+                <button type="button" class="btn btn-lg btn-primary" id="scan-button" data-bs-toggle="modal" data-bs-target="#scan-card-modal">
+                    Save new card
+                </button>
+          </div>
+          <div class="col">
+            <input class="btn btn-primary btn-lg btn-block" id="SubmitButton" type="submit" value="Write to a card">
+          </div>
+        </div>
+      </div>
+
+
+    <!-- End Read/write buttons -->
+
+    </section>
+  <!-- end buttons section -->
+
+    <!-- Cards section -->
+    <section class="p-4">
+  
+    <!-- cards -->
+        <div class="container col-sm-7 mb-2 mb-sm-0 justify-content-center">
+            <label>
+                <h5>Saved cards:</h5>
+            </label>
+
+      {% if cards %}
+        {% for card in cards %}
+            <div class="card text-light mb-3">
+                <div class="card-header">{{ card.name }}</div>
+                <div class="card-body">
+                    <p class="card-text">  UID: {{ card.uid }} <br>Card type: {{ card.type }} <br> Strings found: {{ card.strings }} <br>  </p>
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+      <p>Saved cards will be displayed here</p>
+    {% endif %}
+        </div>
+
+    <!-- cards -->
+
+  </section>
+  <!-- end cards section -->
+
+
+
+  <script src="{{url_for('static', filename='js/jquery-3.7.0.min.js')}}"></script>
+  <script src="{{url_for('static', filename='js/main.js')}}"></script>
+  <script src="{{url_for('static', filename='js/bootstrap.js')}}"></script>
+  </body>
+  <!-- <footer class="navbar-dark text-lg-start text-bg-dark">
+    <div class="text-center p-4 bg-dark">
+
+    </div>
+  </footer> -->
+</html>
