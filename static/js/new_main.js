@@ -26,10 +26,8 @@ document.addEventListener("DOMContentLoaded", function () {
             })
 
             .then(data => {
-                console.log(data);
-                // alert(JSON.stringify(data, null, 2));
-                document.getElementById("info-modal-body").textContent = JSON.stringify(data, null, 4);
-                console.log(JSON.stringify(data, null, 2));
+                var data_html = "<p>UID: " + data.UID + "<br> Card type: " + data.card_type + "</p>";
+                document.getElementById("info-modal-body").innerHTML = data_html;
                 new bootstrap.Modal(info_modal_element).show();     // Create new modal instance
 
             })
