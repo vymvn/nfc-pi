@@ -3,12 +3,14 @@ import subprocess
 import time
 import threading
 import signal
+import random
 
-from flask import Flask, render_template, request, redirect
+from flask import Flask, render_template, request, redirect, jsonify
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 
 from parser import parse
+from utils import random_string
 
 
 # Globals
@@ -33,8 +35,8 @@ app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{db_path}"
 # initialize the app with the extension
 db.init_app(app)
 
-
 os.system("/usr/bin/mkdir -p cards")
+
 
 # Card database model
 class Card(db.Model):
@@ -59,18 +61,22 @@ def scan_thread(event):
     global cancel
     global read_error
 
-    subprocess.run(["rm", "-fr", "/tmp/temp_card_data"])
+    # subprocess.run(["rm", "-fr", f"/tmp/card{random_string(4)}"])
     read = False
+
+    r = random_string(4)
 
     while not read and not cancel and not event.is_set():
         result = subprocess.run(
-            ["./bin/nfc-mfclassic", "r", "a", "u", "/tmp/temp_card_data"]
+            ["./bin/nfc-mfclassic", "r", "a", "u", f"/tmp/card{r}"]
         )
+
         if result.returncode == 0:
-            if os.path.isfile("/tmp/temp_card_data"):
+            if os.path.isfile(f"/tmp/card{r}"):
                 read = True
             else:
                 read_error = True
+
     if cancel:
         cancel = False
 
@@ -97,11 +103,13 @@ def scan_card():
     new_thread = threading.Thread(target=scan_thread, args=[event])
     new_thread.start()
     new_thread.join(30)
+
     if new_thread.is_alive():
         event.set()
         return "timeout"
+        return jsonify({"message": "timeout"}), 408
     
-    return "ok"
+    return jsonify({"message": "ok"}), 200
 
 
 
@@ -109,10 +117,13 @@ def scan_card():
 def save_card():
     name = request.form.get("name")
     new_card = Card(name)
+
     with open("/tmp/temp_card_data", "rb") as f:
         data = f.read()
+
     with open(f"./cards/{name}", "wb") as f:
         f.write(data)
+
     uid, card_type, strings = parse(data)
     new_card.uid = uid
     new_card.type = card_type
