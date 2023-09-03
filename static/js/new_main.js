@@ -16,10 +16,7 @@ document.addEventListener("DOMContentLoaded", function () {
             .then(response => {
                 if (response.ok) {
                     bootstrap.Modal.getInstance(scan_modal_element).hide();     // Modal already open so I can just grab instance
-                    // const scan_modal = new bootstrap.Modal(scan_modal_element).hide();
                     return response.json(); // parse json
-                    //     // If the server operation is successful, show the new modal
-                    //     scan_modal_element.modal('hide');
                 } else {
                     throw new Error("Server error");
                 }
