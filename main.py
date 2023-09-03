@@ -97,19 +97,32 @@ def cancel_scan():
     return redirect("/", code=302)
 
 
+
 @app.route("/scan-card", methods=["POST"])
 def scan_card():
-    event = threading.Event()
-    new_thread = threading.Thread(target=scan_thread, args=[event])
-    new_thread.start()
-    new_thread.join(30)
 
-    if new_thread.is_alive():
-        event.set()
-        return "timeout"
-        return jsonify({"message": "timeout"}), 408
-    
-    return jsonify({"message": "ok"}), 200
+    card_data = {
+        "UID": "de ad be ef",
+        "card_type": "Mifare Classic 1K"
+                 }
+
+    time.sleep(2)
+
+    return jsonify(card_data), 200
+
+# @app.route("/scan-card", methods=["POST"])
+# def scan_card():
+#     event = threading.Event()
+#     new_thread = threading.Thread(target=scan_thread, args=[event])
+#     new_thread.start()
+#     new_thread.join(30)
+#
+#     if new_thread.is_alive():
+#         event.set()
+#         return "timeout"
+#         return jsonify({"message": "timeout"}), 408
+#     
+#     return jsonify({"message": "ok"}), 200
 
 
 
