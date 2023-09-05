@@ -68,39 +68,62 @@
 
 
         <!-- Card Info Modal -->
-        <div class="modal fade" id="card-info-modal" tabindex="-1" aria-labelledby="card-info-modal-label" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
+        <!-- <div class="modal fade" id="card-info-modal" tabindex="-1" aria-labelledby="card-info-modal-label" aria-hidden="true"> -->
+        <!--     <div class="modal-dialog modal-dialog-centered"> -->
+        <!--         <div class="modal-content"> -->
+        <!--             <div class="modal-header"> -->
+        <!--                 <h1 class="modal-title fs-5" id="exampleModalLabel">Card info</h1> -->
+        <!--                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button> -->
+        <!--             </div> -->
+        <!--             <div class="modal-body"> -->
+        <!--                 <div id="info-modal-body"> -->
+        <!---->
+        <!--                 card info goes here -->
+        <!--                      -->
+        <!--                 </div> -->
+        <!--             </div> -->
+        <!--             <div class="modal-footer"> -->
+        <!--                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button> -->
+        <!--                 <button type="button" class="btn btn-primary">Save card</button> -->
+        <!--             </div> -->
+        <!--         </div> -->
+        <!--     </div> -->
+        <!-- </div> -->
+
+
+
+
+        <div class="modal fade" id="card-info-modal" aria-hidden="true" aria-labelledby="card-info-modal-label" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h1 class="modal-title fs-5" id="exampleModalLabel">Card info</h1>
+                        <h1 class="modal-title fs-5">Card info</h1>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
+
                         <div id="info-modal-body">
 
-                        card info goes here
-                            
+                            card info goes here
+
                         </div>
+
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-primary">Save card</button>
+                        <button class="btn btn-primary" data-bs-target="#save-modal" data-bs-toggle="modal">Save card</button>
                     </div>
                 </div>
             </div>
         </div>
-
-
-        <!-- Save card Modal -->
-        <div class="modal fade" id="save-card-modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal fade" id="save-modal" aria-hidden="true" aria-labelledby="save-modal-label" tabindex="-1">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h1 class="modal-title fs-5" id="staticBackdropLabel">Save card</h1>
+                        <h1 class="modal-title fs-5" id="exampleModalToggleLabel2">Save card</h1>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        Card scanned successfully<br> You may now remove the card.
                         <div class="mb-3">
                             <form action="/save-card" method="post">
                                 <label class="col-form-label">Name:</label>
@@ -108,13 +131,40 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <!-- <button type="button" id="save-button" class="btn btn-success" data-bs-dismiss="modal">Save</button> -->
+                        <button class="btn btn-primary" data-bs-target="#card-info-modal" data-bs-toggle="modal">Back</button>
+                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancel</button>
                         <input type="submit" id="save-button" value="Save" class="btn btn-success" data-bs-dismiss="modal">
-                            </form>
                     </div>
                 </div>
             </div>
         </div>
+
+
+
+
+        <!-- Save card Modal -->
+        <!-- <div class="modal fade" id="save-card-modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true"> -->
+        <!--     <div class="modal-dialog modal-dialog-centered"> -->
+        <!--         <div class="modal-content"> -->
+        <!--             <div class="modal-header"> -->
+        <!--                 <h1 class="modal-title fs-5" id="staticBackdropLabel">Save card</h1> -->
+        <!--                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button> -->
+        <!--             </div> -->
+        <!--             <div class="modal-body"> -->
+        <!--                 Card scanned successfully<br> You may now remove the card. -->
+        <!--                 <div class="mb-3"> -->
+        <!--                     <form action="/save-card" method="post"> -->
+        <!--                         <label class="col-form-label">Name:</label> -->
+        <!--                         <input type="text" name="name" class="form-control" id="card-name-input" required> -->
+        <!--                 </div> -->
+        <!--             </div> -->
+        <!--             <div class="modal-footer"> -->
+        <!--                 <input type="submit" id="save-button" value="Save" class="btn btn-success" data-bs-dismiss="modal"> -->
+        <!--                     </form> -->
+        <!--             </div> -->
+        <!--         </div> -->
+        <!--     </div> -->
+        <!-- </div> -->
 
         <!-- Error Modal -->
         <div class="modal fade" id="error-modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
