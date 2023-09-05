@@ -46,6 +46,31 @@ int main() {
             // printf("ATQA: %04X\n", nt.nti.nai.abtAtqa[0]);
             printf("SAK: %02X\n", nt.nti.nai.btSak);
 
+
+            // Determine the card type based on nt.nm.nmt
+            switch (nt.nm.nmt) {
+                case NMT_ISO14443A:
+                    printf("Type: ISO14443A\n");
+                    break;
+                case NMT_ISO14443B:
+                    printf("Type: ISO14443B\n");
+                    break;
+                case NMT_FELICA:
+                    printf("Type: FeliCa\n");
+                    break;
+                case NMT_JEWEL:
+                    printf("Type: Jewel\n");
+                    break;
+                case NMT_DEP:
+                    printf("Type: NFC-DEP\n");
+                    break;
+
+                default:
+                    printf("Type: Unknown\n");
+                    break;
+            }
+
+
             // If no ATS do not print
             if (*nt.nti.nai.abtAts != 0) {
 
@@ -54,30 +79,6 @@ int main() {
                 for (size_t i = 0; i < nt.nti.nai.szAtsLen; i++) {
                     printf("%02X ", nt.nti.nai.abtAts[i]);
                 }
-                printf("\n");
-            }
-
-            // Determine the card type based on nt.nm.nmt
-            switch (nt.nm.nmt) {
-                case NMT_ISO14443A:
-                    printf("Type: ISO14443A");
-                    break;
-                case NMT_ISO14443B:
-                    printf("Type: ISO14443B");
-                    break;
-                case NMT_FELICA:
-                    printf("Type: FeliCa");
-                    break;
-                case NMT_JEWEL:
-                    printf("Type: Jewel");
-                    break;
-                case NMT_DEP:
-                    printf("Type: NFC-DEP");
-                    break;
-
-                default:
-                    printf("Type: Unknown\n");
-                    break;
             }
 
             break;

@@ -47,11 +47,8 @@
                         <!-- <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button> -->
                     </div>
                     <div class="modal-body">
-                        Scan NFC tag on the PN532 and keep it till the scan finishes
+                        Scan NFC tag on the PN532
 
-                        <br>
-
-                            Scanning.. 
                         <div class="spinner-border spinner-border-sm" role="status">
                             <span class="visually-hidden">Loading...</span>
                         </div>
@@ -126,7 +123,7 @@
                     </div>
                     <div class="modal-body">
                         <div class="mb-3">
-                            <form action="/save-card" method="post">
+                            <!-- <form action="/save-card" method="post"> -->
                                 <label class="col-form-label">Name:</label>
                                 <input type="text" name="name" class="form-control" id="card-name-input" required>
                         </div>
@@ -134,7 +131,7 @@
                     <div class="modal-footer">
                         <button class="btn btn-primary" data-bs-target="#card-info-modal" data-bs-toggle="modal">Back</button>
                         <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancel</button>
-                        <input type="submit" id="save-button" value="Save" class="btn btn-success" data-bs-dismiss="modal">
+                        <button type="button" class="btn btn-success" data-bs-dismiss="modal" id="save-button-submit">Save</button>
                     </div>
                 </div>
             </div>
@@ -272,7 +269,16 @@
                 <div class="card text-light mb-3">
                     <div class="card-header">{{ card.name }}</div>
                     <div class="card-body">
-                        <p class="card-text">  UID: {{ card.uid }} <br>Card type: {{ card.type }} <br> Strings found: {{ card.strings }} <br>  </p>
+                        <p class="card-text">  UID: {{ card.uid }} <br>
+                            ATQA: {{ card.atqa }} <br>
+                            SAK: {{ card.sak }} <br>
+                            TYPE: {{ card.type }} <br>
+
+                            {% if card.ats %}
+                                ATS: {{ card.ats }}
+                            {% endif %}
+
+                        </p>
                     </div>
                 </div>
                 {% endfor %}

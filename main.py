@@ -13,11 +13,6 @@ from parser import parse
 from utils import random_string
 
 
-# Globals
-cancel_flag = False
-read_error = False
-
-
 # Path of folder that contains our html
 template_path = os.path.abspath("templates")
 static_path = os.path.abspath("static")
@@ -44,10 +39,11 @@ class Card(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String)
-    type = db.Column(db.String)
     uid = db.Column(db.String)
-    strings = db.Column(db.String)
-    dump_file = f"cards/{name}"
+    atqa = db.Column(db.String)
+    sak = db.Column(db.String)
+    type = db.Column(db.String)
+    ats = db.Column(db.String)
 
     def __init__(self, name: str):
         self.name = name
@@ -57,44 +53,7 @@ with app.app_context():
     db.create_all()
 
 
-# def scan_thread(event):
-#     global cancel
-#     global read_error
-#
-#     # subprocess.run(["rm", "-fr", f"/tmp/card{random_string(4)}"])
-#     read = False
-#
-#     r = random_string(4)
-#
-#     while not read and not cancel and not event.is_set():
-#         result = subprocess.run(
-#             ["./bin/nfc-mfclassic", "r", "a", "u", f"/tmp/card{r}"]
-#         )
-#
-#         if result.returncode == 0:
-#             if os.path.isfile(f"/tmp/card{r}"):
-#                 read = True
-#             else:
-#                 read_error = True
-#
-#     if cancel:
-#         cancel = False
-
-# def scan_thread(exit_event):
-#
-#     if not os.path.isfile("./bin/scan"):
-#         subprocess.run(["mkdir", "-p", "./bin"])
-#         subprocess.run(["gcc", "-o", "./bin/scan", "./nfc-tools/scan.c"])
-#
-#     while not exit_event.is_set():
-#         scan_result = subprocess.check_output(["./bin/scan"], timeout=5)
-#
-#     print(scan_result.decode('utf-8'))
-#
-#     return jsonify({"scan_result": scan_result.decode('utf-8')}), 200
-
-
-
+# ================================================= Start of routes ==============================================================#
 
 @app.route("/")
 def main():
@@ -113,43 +72,6 @@ def cancel_scan():
     return redirect("/", code=302)
 
 
-
-# @app.route("/scan-card", methods=["POST"])
-# def scan_card():
-#
-#     card_data = {
-#         "UID": "de ad be ef",
-#         "card_type": "Mifare Classic 1K"
-#                  }
-#
-#     time.sleep(2)
-#
-#     return jsonify(card_data), 200
-
-# @app.route("/scan-card", methods=["POST"])
-# def scan_card():
-#     event = threading.Event()
-#     new_thread = threading.Thread(target=scan_thread, args=[event])
-#     new_thread.start()
-#     new_thread.join(30)
-#
-#     if new_thread.is_alive():
-#         event.set()
-#         return "timeout"
-#         return jsonify({"message": "timeout"}), 408
-#     
-#     return jsonify({"message": "ok"}), 200
-
-
-# @app.route("/scan-card", methods=["POST"])
-# def scan_card():
-#
-#     exit_event = threading.Event()
-#     new_thread = threading.Thread(target=scan_thread, args=[exit_event])
-#     print(new_thread.name)
-#     # new_thread.start()
-#
-#     return jsonify({"scan_result": "blaaah"}), 200
 
 @app.route("/scan-card", methods=["POST"])
 def scan_card():
@@ -178,30 +100,30 @@ def scan_card():
 
 @app.route("/save-card", methods=["POST"])
 def save_card():
-    return jsonify({"message": "totally saved fr"})
+    data = request.get_json()
+
+    new_card = Card(data.get('card_name'))
+    
+    info_list = data.get('scan_info').split('\n')
+
+    if len(info_list) > 4:
+        ats = True
 
 
-# @app.route("/save-card", methods=["POST"])
-# def save_card():
-#     name = request.form.get("name")
-#     new_card = Card(name)
-#
-#     with open("/tmp/temp_card_data", "rb") as f:
-#         data = f.read()
-#
-#     with open(f"./cards/{name}", "wb") as f:
-#         f.write(data)
-#
-#     uid, card_type, strings = parse(data)
-#     new_card.uid = uid
-#     new_card.type = card_type
-#     new_card.strings = strings
-#
-#     with app.app_context():
-#         db.session.add(new_card)
-#         db.session.commit()
-#
-#     return redirect("/", code=302)
+    new_card.uid = info_list[0].split(':')[1].strip()
+    new_card.atqa = info_list[1].split(':')[1].strip()
+    new_card.sak = info_list[2].split(':')[1].strip()
+    new_card.type = info_list[3].split(':')[1].strip()
+
+    if ats:
+        new_card.ats = info_list[4].split(':')[1].strip()
+
+    with app.app_context():
+        db.session.add(new_card)
+        db.session.commit()
+
+
+    return jsonify({"message": f"{data.get('card_name')} saved"})
 
 
 if __name__ == "__main__":
