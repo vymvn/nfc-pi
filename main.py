@@ -14,7 +14,7 @@ from utils import random_string
 
 
 # Globals
-cancel = False
+cancel_flag = False
 read_error = False
 
 
@@ -57,33 +57,49 @@ with app.app_context():
     db.create_all()
 
 
-def scan_thread(event):
-    global cancel
-    global read_error
+# def scan_thread(event):
+#     global cancel
+#     global read_error
+#
+#     # subprocess.run(["rm", "-fr", f"/tmp/card{random_string(4)}"])
+#     read = False
+#
+#     r = random_string(4)
+#
+#     while not read and not cancel and not event.is_set():
+#         result = subprocess.run(
+#             ["./bin/nfc-mfclassic", "r", "a", "u", f"/tmp/card{r}"]
+#         )
+#
+#         if result.returncode == 0:
+#             if os.path.isfile(f"/tmp/card{r}"):
+#                 read = True
+#             else:
+#                 read_error = True
+#
+#     if cancel:
+#         cancel = False
 
-    # subprocess.run(["rm", "-fr", f"/tmp/card{random_string(4)}"])
-    read = False
+# def scan_thread(exit_event):
+#
+#     if not os.path.isfile("./bin/scan"):
+#         subprocess.run(["mkdir", "-p", "./bin"])
+#         subprocess.run(["gcc", "-o", "./bin/scan", "./nfc-tools/scan.c"])
+#
+#     while not exit_event.is_set():
+#         scan_result = subprocess.check_output(["./bin/scan"], timeout=5)
+#
+#     print(scan_result.decode('utf-8'))
+#
+#     return jsonify({"scan_result": scan_result.decode('utf-8')}), 200
 
-    r = random_string(4)
 
-    while not read and not cancel and not event.is_set():
-        result = subprocess.run(
-            ["./bin/nfc-mfclassic", "r", "a", "u", f"/tmp/card{r}"]
-        )
-
-        if result.returncode == 0:
-            if os.path.isfile(f"/tmp/card{r}"):
-                read = True
-            else:
-                read_error = True
-
-    if cancel:
-        cancel = False
 
 
 @app.route("/")
 def main():
 
+    # Query SQLite DB and render index
     with app.app_context():
         cards = db.session.execute(db.select(Card).order_by(Card.name)).scalars().all()
         
@@ -92,23 +108,23 @@ def main():
 
 @app.route("/cancel-scan", methods=["POST"])
 def cancel_scan():
-    global cancel
-    cancel = True
+    global cancel_flag
+    cancel_flag = True
     return redirect("/", code=302)
 
 
 
-@app.route("/scan-card", methods=["POST"])
-def scan_card():
-
-    card_data = {
-        "UID": "de ad be ef",
-        "card_type": "Mifare Classic 1K"
-                 }
-
-    time.sleep(2)
-
-    return jsonify(card_data), 200
+# @app.route("/scan-card", methods=["POST"])
+# def scan_card():
+#
+#     card_data = {
+#         "UID": "de ad be ef",
+#         "card_type": "Mifare Classic 1K"
+#                  }
+#
+#     time.sleep(2)
+#
+#     return jsonify(card_data), 200
 
 # @app.route("/scan-card", methods=["POST"])
 # def scan_card():
@@ -125,28 +141,67 @@ def scan_card():
 #     return jsonify({"message": "ok"}), 200
 
 
+# @app.route("/scan-card", methods=["POST"])
+# def scan_card():
+#
+#     exit_event = threading.Event()
+#     new_thread = threading.Thread(target=scan_thread, args=[exit_event])
+#     print(new_thread.name)
+#     # new_thread.start()
+#
+#     return jsonify({"scan_result": "blaaah"}), 200
+
+@app.route("/scan-card", methods=["POST"])
+def scan_card():
+    global cancel_flag
+    
+    cancel_flag = False
+    
+    if not os.path.isfile("./bin/scan"):
+        subprocess.run(["mkdir", "-p", "./bin"])
+        subprocess.run(["gcc", "-o", "./bin/scan", "./nfc-tools/scan.c", "-lnfc"])
+
+    while not cancel_flag:
+        try:
+            scan_result = subprocess.check_output(["./bin/scan"], timeout=2)
+        except subprocess.TimeoutExpired:
+            continue
+        if scan_result:
+            break
+
+    if cancel_flag:
+        cancel_flag = False
+    else:
+        return jsonify({"scan_result": scan_result.decode('utf-8')}), 200
+
+
 
 @app.route("/save-card", methods=["POST"])
 def save_card():
-    name = request.form.get("name")
-    new_card = Card(name)
+    return jsonify({"message": "totally saved fr"})
 
-    with open("/tmp/temp_card_data", "rb") as f:
-        data = f.read()
 
-    with open(f"./cards/{name}", "wb") as f:
-        f.write(data)
-
-    uid, card_type, strings = parse(data)
-    new_card.uid = uid
-    new_card.type = card_type
-    new_card.strings = strings
-
-    with app.app_context():
-        db.session.add(new_card)
-        db.session.commit()
-
-    return redirect("/", code=302)
+# @app.route("/save-card", methods=["POST"])
+# def save_card():
+#     name = request.form.get("name")
+#     new_card = Card(name)
+#
+#     with open("/tmp/temp_card_data", "rb") as f:
+#         data = f.read()
+#
+#     with open(f"./cards/{name}", "wb") as f:
+#         f.write(data)
+#
+#     uid, card_type, strings = parse(data)
+#     new_card.uid = uid
+#     new_card.type = card_type
+#     new_card.strings = strings
+#
+#     with app.app_context():
+#         db.session.add(new_card)
+#         db.session.commit()
+#
+#     return redirect("/", code=302)
 
 
 if __name__ == "__main__":

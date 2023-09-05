@@ -23,9 +23,16 @@ document.addEventListener("DOMContentLoaded", function () {
             })
 
             .then(data => {
-                var data_html = "<p>UID: " + data.UID + "<br> Card type: " + data.card_type + "</p>";
-                document.getElementById("info-modal-body").innerHTML = data_html;
-                new bootstrap.Modal(info_modal_element).show();     // Create new modal instance
+
+                if (data.scan_result) {
+
+                    document.getElementById("info-modal-body").innerText = data.scan_result;
+                    new bootstrap.Modal(info_modal_element).show();     // Create new modal instance
+                }
+
+                else if (data.message) {
+                    console.log(data.message);
+                }
 
             })
 
@@ -35,4 +42,18 @@ document.addEventListener("DOMContentLoaded", function () {
             });
 
     });
+
+    // save_button.addEventListener("click", function () {
+    //
+    //     fetch('/save-card', {
+    //         method: 'POST',
+    //         headers: {
+    //             'Content-Type': 'application/json'
+    //         },
+    //     })
+    //         .then(response => {
+    //             console.log(response);
+    //         })
+    //
+    // });
 });
