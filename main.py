@@ -12,6 +12,8 @@ from flask_sqlalchemy import SQLAlchemy
 from parser import parse
 from utils import random_string
 
+# Globals
+cancel_flag = False
 
 # Path of folder that contains our html
 template_path = os.path.abspath("templates")
@@ -80,6 +82,7 @@ def scan_card():
     cancel_flag = False
     
     if not os.path.isfile("./bin/scan"):
+        app.logger.info("scan binary not found. compiling..")
         subprocess.run(["mkdir", "-p", "./bin"])
         subprocess.run(["gcc", "-o", "./bin/scan", "./nfc-tools/scan.c", "-lnfc"])
 
@@ -106,7 +109,10 @@ def save_card():
     
     info_list = data.get('scan_info').split('\n')
 
-    if len(info_list) > 4:
+    ats = False
+
+    if len(info_list) > 5:
+        print(len(info_list))
         ats = True
 
 
